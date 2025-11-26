@@ -109,7 +109,7 @@ void PatternOffload::SSREventListener(void)
                      ssr_event = (atoi(msg_ptr));
                      switch(ssr_event) {
                          case SLATE_AFTER_POWER_UP:
-                             ALOGD("SLATE is powered up");
+                             //ALOGD("SLATE is powered up");
                              SendPatterns();
                              break;
                      }
