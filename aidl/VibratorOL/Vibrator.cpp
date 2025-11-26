@@ -140,7 +140,7 @@ InputFFDevice::InputFFDevice()
                 && strcmp(name, "aw8697_haptic")
                 && strcmp(name, "awinic_haptic")
                 && strcmp(name, "drv2624:haptics")) {
-            ALOGD("not a supported haptics device\n");
+            //ALOGD("not a supported haptics device\n");
             close(fd);
             continue;
         }
@@ -558,7 +558,7 @@ ndk::ScopedAStatus VibratorOL::getCapabilities(int32_t* _aidl_return) {
     *_aidl_return = IVibrator::CAP_ON_CALLBACK;
 
     if (ledVib.mDetected) {
-        ALOGD("QTI Vibrator reporting capabilities: %d", *_aidl_return);
+        //ALOGD("QTI Vibrator reporting capabilities: %d", *_aidl_return);
         return ndk::ScopedAStatus::ok();
     }
 
@@ -575,7 +575,7 @@ ndk::ScopedAStatus VibratorOL::getCapabilities(int32_t* _aidl_return) {
     if (ff.mSupportExternalControl)
         *_aidl_return |= IVibrator::CAP_EXTERNAL_CONTROL;
 
-    ALOGD("QTI Vibrator reporting capabilities: %d", *_aidl_return);
+    //ALOGD("QTI Vibrator reporting capabilities: %d", *_aidl_return);
     return ndk::ScopedAStatus::ok();
 }
 
@@ -583,7 +583,7 @@ ndk::ScopedAStatus VibratorOL::off() {
     int ret;
     int composeEven = STOP_COMPOSE;
 
-    ALOGD("QTI Vibrator off");
+    //ALOGD("QTI Vibrator off");
     if (ledVib.mDetected)
         ret = ledVib.off();
     else
@@ -606,7 +606,7 @@ ndk::ScopedAStatus VibratorOL::on(int32_t timeoutMs,
                                 const std::shared_ptr<IVibratorCallback>& callback) {
     int ret;
 
-    ALOGD("Vibrator on for timeoutMs: %d", timeoutMs);
+    //ALOGD("Vibrator on for timeoutMs: %d", timeoutMs);
     if (ledVib.mDetected)
         ret = ledVib.on(timeoutMs);
     else
@@ -617,9 +617,9 @@ ndk::ScopedAStatus VibratorOL::on(int32_t timeoutMs,
 
     if (callback != nullptr) {
         std::thread([=] {
-            ALOGD("Starting on on another thread");
+            //ALOGD("Starting on on another thread");
             usleep(timeoutMs * 1000);
-            ALOGD("Notifying on complete");
+            //ALOGD("Notifying on complete");
             if (!callback->onComplete().isOk()) {
                 ALOGE("Failed to call onComplete");
             }
@@ -636,7 +636,7 @@ ndk::ScopedAStatus VibratorOL::perform(Effect effect, EffectStrength es, const s
     if (ledVib.mDetected)
         return ndk::ScopedAStatus(AStatus_fromExceptionCode(EX_UNSUPPORTED_OPERATION));
 
-    ALOGD("Vibrator perform effect %d", effect);
+    //ALOGD("Vibrator perform effect %d", effect);
 
     if (Offload.mEnabled == 1) {
          if ((effect < Effect::CLICK) ||
@@ -660,9 +660,9 @@ ndk::ScopedAStatus VibratorOL::perform(Effect effect, EffectStrength es, const s
 
     if (callback != nullptr) {
         std::thread([=] {
-            ALOGD("Starting perform on another thread");
+            //ALOGD("Starting perform on another thread");
             usleep(playLengthMs * 1000);
-            ALOGD("Notifying perform complete");
+            //ALOGD("Notifying perform complete");
             callback->onComplete();
         }).detach();
     }
@@ -709,7 +709,7 @@ ndk::ScopedAStatus VibratorOL::setAmplitude(float amplitude) {
     if (!ff.mSupportGain)
         return ndk::ScopedAStatus(AStatus_fromExceptionCode(EX_UNSUPPORTED_OPERATION));
 
-    ALOGD("Vibrator set amplitude: %f", amplitude);
+    //ALOGD("Vibrator set amplitude: %f", amplitude);
 
     if (amplitude <= 0.0f || amplitude > 1.0f)
         return ndk::ScopedAStatus(AStatus_fromExceptionCode(EX_ILLEGAL_ARGUMENT));
@@ -729,7 +729,7 @@ ndk::ScopedAStatus VibratorOL::setExternalControl(bool enabled) {
     if (ledVib.mDetected)
         return ndk::ScopedAStatus(AStatus_fromExceptionCode(EX_UNSUPPORTED_OPERATION));
 
-    ALOGD("Vibrator set external control: %d", enabled);
+    //ALOGD("Vibrator set external control: %d", enabled);
     if (!ff.mSupportExternalControl)
         return ndk::ScopedAStatus(AStatus_fromExceptionCode(EX_UNSUPPORTED_OPERATION));
 
@@ -831,7 +831,7 @@ ndk::ScopedAStatus VibratorOL::getPrimitiveDuration(CompositePrimitive primitive
     if (stream != NULL && stream->play_rate_hz != 0)
         *durationMs = ((stream->length * 1000) / stream->play_rate_hz) + 1;
 
-    ALOGD("primitive-%d duration is %dms", primitive, *durationMs);
+    //ALOGD("primitive-%d duration is %dms", primitive, *durationMs);
     return ndk::ScopedAStatus::ok();
 #endif
 
@@ -845,7 +845,7 @@ ndk::ScopedAStatus VibratorOL::getPrimitiveDuration(CompositePrimitive primitive
     if (ret < 0)
         return ndk::ScopedAStatus::fromExceptionCode(EX_UNSUPPORTED_OPERATION);
 
-    ALOGD("primitive-%d duration is %dms", primitive, *durationMs);
+    //ALOGD("primitive-%d duration is %dms", primitive, *durationMs);
 
     return ndk::ScopedAStatus::ok();
 }
@@ -859,7 +859,7 @@ void VibratorOL::composePlayThread(VibratorOL *vibrator,
     int status = 0;
     int ret = 0;
 
-    ALOGD("start a new thread for composeEffect");
+    //ALOGD("start a new thread for composeEffect");
     for (auto& e : composite) {
         if (e.delayMs) {
             nfd = epoll_wait(vibrator->epollfd, &events, 1, e.delayMs);
@@ -923,7 +923,7 @@ void VibratorOL::composePlayThread(VibratorOL *vibrator,
         }
     }
 
-    ALOGD("Notifying composite complete, playlength= %ld", playLengthMs);
+    //ALOGD("Notifying composite complete, playlength= %ld", playLengthMs);
     if (callback)
         callback->onComplete();
 
@@ -964,7 +964,7 @@ ndk::ScopedAStatus VibratorOL::compose(const std::vector<CompositeEffect>& compo
     timeoutMs = (timeoutMs + 10) * 2;
     /* Stop previous composition if it has not yet been completed */
     if (inComposition) {
-        ALOGD("Last composePlayThread has not done yet, stop it manually");
+        //ALOGD("Last composePlayThread has not done yet, stop it manually");
         off();
 
         while (inComposition && timeoutMs--)
@@ -983,7 +983,7 @@ ndk::ScopedAStatus VibratorOL::compose(const std::vector<CompositeEffect>& compo
         return ndk::ScopedAStatus::fromExceptionCode(EX_SERVICE_SPECIFIC);
     }
     if (nfd > 0) {
-        ALOGD("A stale event is cached in the pipe, remove it");
+        //ALOGD("A stale event is cached in the pipe, remove it");
         read(pipefd[0], &status, sizeof(int));
     }
 
@@ -991,7 +991,7 @@ ndk::ScopedAStatus VibratorOL::compose(const std::vector<CompositeEffect>& compo
     composeThread = std::thread(composePlayThread, this, composite, callback);
     composeThread.detach();
 
-    ALOGD("trigger composition successfully");
+    //ALOGD("trigger composition successfully");
     return ndk::ScopedAStatus::ok();
 }
 
